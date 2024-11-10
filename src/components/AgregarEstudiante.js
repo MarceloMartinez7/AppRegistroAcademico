@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { db } from '../database/firebaseconfig';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, doc, setDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -38,7 +38,8 @@ const FormularioEstudiante = () => {
         asignaturas,
       };
 
-      await addDoc(collection(db, 'registrosAcademicos'), estudianteData);
+      // Guardar el estudiante con la matrícula como ID en Firebase
+      await setDoc(doc(db, 'estudiantes', matricula), estudianteData);
 
       Alert.alert('Éxito', 'Estudiante agregado exitosamente');
       setNombre('');
@@ -110,7 +111,6 @@ const FormularioEstudiante = () => {
     </View>
   );
 };
-
 export default FormularioEstudiante;
 
 const styles = StyleSheet.create({

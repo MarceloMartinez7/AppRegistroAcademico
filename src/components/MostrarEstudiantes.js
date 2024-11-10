@@ -1,4 +1,3 @@
-// CatalogoEstudiantes.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { db } from '../database/firebaseconfig';
@@ -13,7 +12,7 @@ const MostrarEstudiantes = () => {
   useEffect(() => {
     const obtenerEstudiantes = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'registrosAcademicos'));
+        const querySnapshot = await getDocs(collection(db, 'estudiantes'));
         const listaEstudiantes = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -39,6 +38,25 @@ const MostrarEstudiantes = () => {
           {asig.asignatura} - Promedio: {asig.promedio}
         </Text>
       ))}
+
+      {/* Botones para actualizar y eliminar */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.updateButton}
+          onPress={() => navigation.navigate('ActualizarEstudiante', { id: item.id })}
+        >
+          <Icon name="create-outline" size={24} color="#FFF" />
+          <Text style={styles.buttonText}>Actualizar</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => navigation.navigate('EliminarEstudiante', { id: item.id })}
+        >
+          <Icon name="trash-outline" size={24} color="#FFF" />
+          <Text style={styles.buttonText}>Eliminar</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -55,7 +73,7 @@ const MostrarEstudiantes = () => {
       {/* Botón circular flotante */}
       <TouchableOpacity
         style={styles.floatingButton}
-        onPress={() => navigation.navigate('AgregarEstudiante')} // Navega al formulario para agregar estudiante
+        onPress={() => navigation.navigate('AgregarEstudiante')}
       >
         <Icon name="person-add" size={40} color="#17c82a" />
       </TouchableOpacity>
@@ -124,6 +142,31 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#555',
     marginTop: 4,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
+  },
+  updateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#3498db',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 5,
+    marginRight: 8,
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e74c3c',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: '#FFF',
+    marginLeft: 5,
   },
   floatingButton: {
     position: 'absolute',

@@ -6,6 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
 import FormularioEstudiante from '../components/AgregarEstudiante';
+import EliminarEstudiante from '../components/EliminarEstudiantes';
 import Inicio from '../components/Inicio';
 
 const Tab = createBottomTabNavigator();
@@ -41,6 +42,11 @@ function AppStack() {
         name="AgregarEstudiante"
         component={FormularioEstudiante}
         options={{ title: 'Agregar Estudiante' }}
+      />
+      <Stack.Screen
+        name="EliminarEstudiante"
+        component={EliminarEstudiante}
+        options={{ title: 'Eliminar Estudiante' }}
       />
     </Stack.Navigator>
   );
