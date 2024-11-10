@@ -9,6 +9,7 @@ import FormularioEstudiante from '../components/AgregarEstudiante';
 import EliminarEstudiante from '../components/EliminarEstudiantes';
 import Inicio from '../components/Inicio';
 import ActualizarEstudiante from '../components/ActualizarEstudiante';
+import EstadisticasEstudiantes from '../components/EstadisticasEstudiantes';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -22,6 +23,15 @@ function TabNavigator() {
         component={Inicio}
         options={{
           tabBarLabel: 'Inicio',
+          tabBarIcon: ({ color, size }) => <AntDesign name="appstore-o" size={24} color={color} />,
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen
+        name="Estadisticas"
+        component={EstadisticasEstudiantes}
+        options={{
+          tabBarLabel: 'Estadisticas',
           tabBarIcon: ({ color, size }) => <AntDesign name="appstore-o" size={24} color={color} />,
           headerShown: false,
         }}
