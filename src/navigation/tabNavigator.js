@@ -8,6 +8,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import FormularioEstudiante from '../components/AgregarEstudiante';
 import EliminarEstudiante from '../components/EliminarEstudiantes';
 import Inicio from '../components/Inicio';
+import ActualizarEstudiante from '../components/ActualizarEstudiante';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -47,6 +48,11 @@ function AppStack() {
         name="EliminarEstudiante"
         component={EliminarEstudiante}
         options={{ title: 'Eliminar Estudiante' }}
+      />
+      <Stack.Screen
+        name="ActualizarEstudiante"
+        component={ActualizarEstudiante}
+        options={{ title: 'Actualizar Estudiante' }}
       />
     </Stack.Navigator>
   );
