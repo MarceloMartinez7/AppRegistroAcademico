@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, ScrollView, ActivityIndicator } from 'react-native';
 import { db } from '../database/firebaseconfig';
 import { collection, getDocs } from 'firebase/firestore';
-import { BarChart, PieChart } from 'react-native-chart-kit';
+import { BarChart, PieChart, LineChart } from 'react-native-chart-kit'; // Importa sólo algunos gráficos
 
-const GraficoEstudiantes = () => {
+const GraficosEstadisticos = () => {
   const [promediosAsignaturas, setPromediosAsignaturas] = useState([]);
   const [estudiantesData, setEstudiantesData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +24,6 @@ const GraficoEstudiantes = () => {
       }
 
       let asignaturaPromedios = {};
-
       estudiantesData.forEach((estudiante) => {
         estudiante.asignaturas.forEach((asignatura) => {
           const promedio = parseFloat(asignatura.promedio) || 0;
@@ -57,49 +56,73 @@ const GraficoEstudiantes = () => {
 
   const barChartData = {
     labels: promediosAsignaturas.map((item) => item.asignatura),
-    datasets: [
-      {
-        data: promediosAsignaturas.map((item) => item.promedio),
-      },
-    ],
+    datasets: [{ data: promediosAsignaturas.map((item) => item.promedio) }],
   };
 
-  const promedioGeneral = 70;
-  const estudiantesPorEncimaPromedio = estudiantesData.filter((estudiante) => {
-    const promedioEstudiante = estudiante.asignaturas.reduce((acc, asig) => acc + parseFloat(asig.promedio || 0), 0) / estudiante.asignaturas.length;
-    return promedioEstudiante >= promedioGeneral;
-  }).length;
-  const estudiantesPorDebajoPromedio = estudiantesData.length - estudiantesPorEncimaPromedio;
+  const lineChartData = {
+    labels: promediosAsignaturas.map((item) => item.asignatura),
+    datasets: [{ data: promediosAsignaturas.map((item) => item.promedio) }],
+  };
 
   const pieChartData = [
-    { name: '>= 70', population: estudiantesPorEncimaPromedio, color: 'green', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-    { name: '< 70', population: estudiantesPorDebajoPromedio, color: 'red', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+    {
+      name: 'Promedio >= 70',
+      population: estudiantesData.filter((estudiante) =>
+        estudiante.asignaturas.some((asig) => parseFloat(asig.promedio) >= 70)
+      ).length,
+      color: 'green',
+      legendFontColor: '#7F7F7F',
+      legendFontSize: 15,
+    },
+    {
+      name: 'Promedio < 70',
+      population: estudiantesData.filter((estudiante) =>
+        estudiante.asignaturas.some((asig) => parseFloat(asig.promedio) < 70)
+      ).length,
+      color: 'red',
+      legendFontColor: '#7F7F7F',
+      legendFontSize: 15,
+    },
   ];
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Promedio por Asignatura</Text>
-      <BarChart
-        data={barChartData}
-        width={Dimensions.get('window').width - 40}
-        height={220}
-        yAxisSuffix="%"
-        chartConfig={chartConfig}
-        verticalLabelRotation={30}
-      />
+    <ScrollView style={styles.scrollContainer}>
+      <View style={styles.chartContainer}>
+        <Text style={styles.title}>Promedio por Asignatura (BarChart)</Text>
+        <BarChart
+          data={barChartData}
+          width={Dimensions.get('window').width - 40}
+          height={220}
+          chartConfig={chartConfig}
+          verticalLabelRotation={30}
+        />
+      </View>
 
-      <Text style={styles.title}>Proporción de Estudiantes por Promedio</Text>
-      <PieChart
-        data={pieChartData}
-        width={Dimensions.get('window').width - 40}
-        height={220}
-        chartConfig={chartConfig}
-        accessor="population"
-        backgroundColor="transparent"
-        paddingLeft="15"
-        absolute
-      />
-    </View>
+      <View style={styles.chartContainer}>
+        <Text style={styles.title}>Tendencia del Promedio (LineChart)</Text>
+        <LineChart
+          data={lineChartData}
+          width={Dimensions.get('window').width - 40}
+          height={220}
+          chartConfig={chartConfig}
+          bezier
+        />
+      </View>
+
+      <View style={styles.chartContainer}>
+        <Text style={styles.title}>Proporción por Promedio (PieChart)</Text>
+        <PieChart
+          data={pieChartData}
+          width={Dimensions.get('window').width - 40}
+          height={220}
+          chartConfig={chartConfig}
+          accessor="population"
+          backgroundColor="transparent"
+          paddingLeft="15"
+          absolute
+        />
+      </View>
+    </ScrollView>
   );
 };
 
@@ -112,17 +135,20 @@ const chartConfig = {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  scrollContainer: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#fff',
   },
+  chartContainer: {
+    marginVertical: 15,
+    alignItems: 'center',
+  },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 5,
     textAlign: 'center',
   },
 });
 
-export default GraficoEstudiantes;
+export default GraficosEstadisticos;

@@ -32,7 +32,7 @@ function TabNavigator() {
         component={EstadisticasEstudiantes}
         options={{
           tabBarLabel: 'Estadisticas',
-          tabBarIcon: ({ color, size }) => <AntDesign name="appstore-o" size={24} color={color} />,
+          tabBarIcon: ({ color, size }) => <AntDesign name="linechart" size={24} color={color} />, // Cambiado a 'linechart'
           headerShown: false,
         }}
       />
