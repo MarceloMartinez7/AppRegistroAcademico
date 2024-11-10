@@ -13,10 +13,21 @@ const MostrarEstudiantes = () => {
     const obtenerEstudiantes = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, 'estudiantes'));
-        const listaEstudiantes = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const listaEstudiantes = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          // Asegurarse de que asignaturas existe y contiene datos válidos
+          const asignaturas = data.asignaturas || [];
+          
+          // Calcular el promedio general asegurando que `promedio` sea numérico
+          const sumaPromedios = asignaturas.reduce((acc, curr) => acc + (parseFloat(curr.promedio) || 0), 0);
+          const promedioGeneral = asignaturas.length > 0 ? sumaPromedios / asignaturas.length : 0;
+
+          return {
+            id: doc.id,
+            ...data,
+            promedio: promedioGeneral.toFixed(2), // Guardar el promedio con dos decimales
+          };
+        });
         setEstudiantes(listaEstudiantes);
       } catch (error) {
         console.error('Error al obtener los estudiantes: ', error);
@@ -39,7 +50,6 @@ const MostrarEstudiantes = () => {
         </Text>
       ))}
 
-      {/* Botones para actualizar y eliminar */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.updateButton}
@@ -70,7 +80,6 @@ const MostrarEstudiantes = () => {
         contentContainerStyle={styles.lista}
       />
 
-      {/* Botón circular flotante */}
       <TouchableOpacity
         style={styles.floatingButton}
         onPress={() => navigation.navigate('AgregarEstudiante')}

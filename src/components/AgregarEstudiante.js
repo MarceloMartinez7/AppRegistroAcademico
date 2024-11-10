@@ -7,7 +7,6 @@ import * as ImagePicker from 'expo-image-picker';
 
 const FormularioEstudiante = () => {
   const [nombre, setNombre] = useState('');
-  const [matricula, setMatricula] = useState('');
   const [foto, setFoto] = useState('');
   const [asignaturas, setAsignaturas] = useState([{ asignatura: '', promedio: '' }]);
   const navigation = useNavigation();
@@ -24,13 +23,20 @@ const FormularioEstudiante = () => {
     }
   };
 
+  const generarMatricula = () => {
+    const timestamp = Date.now().toString();
+    const randomNumber = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    return `${timestamp}-${randomNumber}`;
+  };
+
   const agregarEstudiante = async () => {
-    if (!nombre || !matricula || asignaturas.length === 0) {
+    if (!nombre || asignaturas.length === 0) {
       Alert.alert('Error', 'Por favor, complete todos los campos');
       return;
     }
 
     try {
+      const matricula = generarMatricula(); // Genera la matrícula automáticamente
       const estudianteData = {
         nombre,
         matricula,
@@ -38,12 +44,11 @@ const FormularioEstudiante = () => {
         asignaturas,
       };
 
-      // Guardar el estudiante con la matrícula como ID en Firebase
+      // Guardar el estudiante con la matrícula generada como ID en Firebase
       await setDoc(doc(db, 'estudiantes', matricula), estudianteData);
 
       Alert.alert('Éxito', 'Estudiante agregado exitosamente');
       setNombre('');
-      setMatricula('');
       setFoto('');
       setAsignaturas([{ asignatura: '', promedio: '' }]);
       navigation.goBack();
@@ -72,7 +77,6 @@ const FormularioEstudiante = () => {
     <View style={styles.container}>
       <Text style={styles.titulo}>Agregar Nuevo Estudiante</Text>
       <TextInput placeholder="Nombre" style={styles.input} onChangeText={setNombre} value={nombre} />
-      <TextInput placeholder="Matrícula" style={styles.input} onChangeText={setMatricula} value={matricula} />
 
       <TouchableOpacity onPress={pickImage} style={styles.botonFoto}>
         <Text style={styles.textoBotonFoto}>{foto ? 'Cambiar Foto' : 'Seleccionar Foto'}</Text>
