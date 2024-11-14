@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, ScrollView, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, Dimensions, ScrollView, ActivityIndicator, Button } from 'react-native';
 import { db } from '../database/firebaseconfig';
 import { collection, getDocs } from 'firebase/firestore';
-import { BarChart, PieChart, LineChart } from 'react-native-chart-kit'; // Importa sólo algunos gráficos
+import { BarChart, LineChart, PieChart } from 'react-native-chart-kit';
+import jsPDF from 'jspdf';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 
 const GraficosEstadisticos = () => {
   const [promediosAsignaturas, setPromediosAsignaturas] = useState([]);
@@ -47,6 +50,50 @@ const GraficosEstadisticos = () => {
       console.error('Error al obtener estadísticas: ', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const generarPDF = async () => {
+    try {
+      const doc = new jsPDF();
+      doc.text("Reporte de Estadísticas de Asignaturas", 10, 10);
+
+      // Sección 1: Promedio por Asignatura (BarChart)
+      doc.text("Promedio por Asignatura", 10, 20);
+      promediosAsignaturas.forEach((item, index) => {
+        doc.text(`${item.asignatura}: ${item.promedio.toFixed(2)}`, 10, 30 + index * 10);
+      });
+
+      // Sección 2: Tendencia del Promedio (LineChart)
+      doc.text("Tendencia del Promedio", 10, 50 + promediosAsignaturas.length * 10);
+      promediosAsignaturas.forEach((item, index) => {
+        doc.text(`${item.asignatura}: ${item.promedio.toFixed(2)}`, 10, 60 + promediosAsignaturas.length * 10 + index * 10);
+      });
+
+      // Sección 3: Proporción por Promedio (PieChart)
+      doc.text("Proporción por Promedio", 10, 80 + promediosAsignaturas.length * 20);
+      const estudiantesConPromedioAlto = estudiantesData.filter((estudiante) =>
+        estudiante.asignaturas.some((asig) => parseFloat(asig.promedio) >= 70)
+      ).length;
+
+      const estudiantesConPromedioBajo = estudiantesData.filter((estudiante) =>
+        estudiante.asignaturas.some((asig) => parseFloat(asig.promedio) < 70)
+      ).length;
+
+      doc.text(`Promedio >= 70: ${estudiantesConPromedioAlto}`, 10, 90 + promediosAsignaturas.length * 20);
+      doc.text(`Promedio < 70: ${estudiantesConPromedioBajo}`, 10, 100 + promediosAsignaturas.length * 20);
+
+      // Guardar y compartir PDF
+      const pdfBase64 = doc.output('datauristring').split(',')[1];
+      const fileUri = `${FileSystem.documentDirectory}reporte_estadisticas_asignaturas.pdf`;
+
+      await FileSystem.writeAsStringAsync(fileUri, pdfBase64, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      await Sharing.shareAsync(fileUri);
+    } catch (error) {
+      console.error("Error al generar o compartir el PDF: ", error);
     }
   };
 
@@ -122,6 +169,8 @@ const GraficosEstadisticos = () => {
           absolute
         />
       </View>
+
+      <Button title="Generar PDF" onPress={generarPDF} />
     </ScrollView>
   );
 };
