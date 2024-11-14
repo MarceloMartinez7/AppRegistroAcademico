@@ -1,41 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { db } from '../database/firebaseconfig';
 import { collection, getDocs } from 'firebase/firestore';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const MostrarEstudiantes = () => {
   const [estudiantes, setEstudiantes] = useState([]);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const obtenerEstudiantes = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'estudiantes'));
-        const listaEstudiantes = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          // Asegurarse de que asignaturas existe y contiene datos válidos
-          const asignaturas = data.asignaturas || [];
-          
-          // Calcular el promedio general asegurando que `promedio` sea numérico
-          const sumaPromedios = asignaturas.reduce((acc, curr) => acc + (parseFloat(curr.promedio) || 0), 0);
-          const promedioGeneral = asignaturas.length > 0 ? sumaPromedios / asignaturas.length : 0;
+  const obtenerEstudiantes = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'estudiantes'));
+      const listaEstudiantes = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        const asignaturas = data.asignaturas || [];
+        const sumaPromedios = asignaturas.reduce((acc, curr) => acc + (parseFloat(curr.promedio) || 0), 0);
+        const promedioGeneral = asignaturas.length > 0 ? sumaPromedios / asignaturas.length : 0;
 
-          return {
-            id: doc.id,
-            ...data,
-            promedio: promedioGeneral.toFixed(2), // Guardar el promedio con dos decimales
-          };
-        });
-        setEstudiantes(listaEstudiantes);
-      } catch (error) {
-        console.error('Error al obtener los estudiantes: ', error);
-      }
-    };
+        return {
+          id: doc.id,
+          ...data,
+          promedio: promedioGeneral.toFixed(2),
+        };
+      });
+      setEstudiantes(listaEstudiantes);
+    } catch (error) {
+      console.error('Error al obtener los estudiantes: ', error);
+    }
+  };
 
-    obtenerEstudiantes();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      obtenerEstudiantes();
+    }, [])
+  );
 
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
@@ -91,6 +90,7 @@ const MostrarEstudiantes = () => {
 };
 
 export default MostrarEstudiantes;
+
 
 const styles = StyleSheet.create({
   container: {
