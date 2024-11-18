@@ -37,34 +37,34 @@ const MostrarEstudiantes = () => {
   );
 
   const renderItem = ({ item }) => (
-    <View style={styles.itemContainer}>
+    <View style={styles.card}>
       <Image source={{ uri: item.foto || 'https://via.placeholder.com/150' }} style={styles.imagen} />
-      <Text style={styles.nombre}>Nombre: {item.nombre}</Text>
-      <Text style={styles.matricula}>Matrícula: {item.matricula}</Text>
-      <Text style={styles.promedio}>Promedio General: {item.promedio}</Text>
-      <Text style={styles.asignaturasTitulo}>Asignaturas:</Text>
-      {item.asignaturas && item.asignaturas.map((asig, index) => (
-        <Text key={index} style={styles.asignatura}>
-          {asig.asignatura} - Promedio: {asig.promedio}
-        </Text>
-      ))}
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.updateButton}
-          onPress={() => navigation.navigate('ActualizarEstudiante', { id: item.id })}
-        >
-          <Icon name="create-outline" size={24} color="#FFF" />
-          <Text style={styles.buttonText}>Actualizar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => navigation.navigate('EliminarEstudiante', { id: item.id })}
-        >
-          <Icon name="trash-outline" size={24} color="#FFF" />
-          <Text style={styles.buttonText}>Eliminar</Text>
-        </TouchableOpacity>
+      <View style={styles.cardContent}>
+        <Text style={styles.nombre}>{item.nombre}</Text>
+        <Text style={styles.matricula}>Matrícula: {item.matricula}</Text>
+        <Text style={styles.promedio}>Promedio General: {item.promedio}</Text>
+        <Text style={styles.asignaturasTitulo}>Asignaturas:</Text>
+        {item.asignaturas && item.asignaturas.map((asig, index) => (
+          <Text key={index} style={styles.asignatura}>
+            • {asig.asignatura}: {asig.promedio}
+          </Text>
+        ))}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.updateButton}
+            onPress={() => navigation.navigate('ActualizarEstudiante', { id: item.id })}
+          >
+            <Icon name="create-outline" size={20} color="#FFF" />
+            <Text style={styles.buttonText}>Actualizar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => navigation.navigate('EliminarEstudiante', { id: item.id })}
+          >
+            <Icon name="trash-outline" size={20} color="#FFF" />
+            <Text style={styles.buttonText}>Eliminar</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -78,7 +78,6 @@ const MostrarEstudiantes = () => {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.lista}
       />
-
       <TouchableOpacity
         style={styles.floatingButton}
         onPress={() => navigation.navigate('AgregarEstudiante')}
@@ -91,96 +90,105 @@ const MostrarEstudiantes = () => {
 
 export default MostrarEstudiantes;
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F8F9FA',
     padding: 16,
-    backgroundColor: '#FFF',
   },
   titulo: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#2C3E50',
     textAlign: 'center',
     marginBottom: 16,
   },
   lista: {
     paddingBottom: 16,
   },
-  itemContainer: {
-    backgroundColor: '#F0F0F0',
+  card: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
     padding: 16,
     marginBottom: 16,
-    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
   imagen: {
-    width: 150,
-    height: 150,
-    resizeMode: 'cover',
-    borderRadius: 8,
-    marginBottom: 10,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginRight: 16,
+    marginTop: 50,
+  },
+  cardContent: {
+    flex: 1,
+    justifyContent: 'space-between',
   },
   nombre: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#34495E',
+    marginBottom: 4,
   },
   matricula: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 14,
+    color: '#7F8C8D',
     marginBottom: 4,
   },
   promedio: {
-    fontSize: 16,
+    fontSize: 14,
+    color: '#27AE60',
     fontWeight: 'bold',
-    color: '#1E8449',
+    marginBottom: 8,
   },
   asignaturasTitulo: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
-    color: '#333',
-    marginTop: 10,
+    color: '#34495E',
+    marginTop: 8,
   },
   asignatura: {
-    fontSize: 14,
-    color: '#555',
-    marginTop: 4,
+    fontSize: 13,
+    color: '#7F8C8D',
   },
   buttonContainer: {
     flexDirection: 'row',
+    justifyContent: 'center', // Centra los botones
     marginTop: 10,
   },
   updateButton: {
+    backgroundColor: '#3498DB',
+    borderRadius: 8,
+    padding: 8,
+    marginHorizontal: 4, // Reduce la separación entre botones
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#3498db',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 5,
-    marginRight: 8,
   },
   deleteButton: {
+    backgroundColor: '#E74C3C',
+    borderRadius: 8,
+    padding: 8, // Igual al de actualizar
+    marginHorizontal: 4, // Reduce la separación entre botones
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e74c3c',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 5,
   },
   buttonText: {
     color: '#FFF',
     marginLeft: 5,
+    fontSize: 14,
   },
   floatingButton: {
     position: 'absolute',
     bottom: 20,
     right: 20,
+    backgroundColor: '#FFF',
+    borderRadius: 50,
     elevation: 5,
+    padding: 10,
   },
 });
